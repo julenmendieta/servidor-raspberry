@@ -39,7 +39,7 @@ do
                 user=`w -h | sed -n ${n}p | awk '{print $1}'`
                 # Comprobamos no haber avisado antes sobre este usuario
                 coinci=`grep -c "$user $puerto $ip" $control`
-                if $((coinci == 0))
+                if [ "$coinci" -eq "0" ]
                 then
                     # Si no hay aviso previo mandamos mensaje y guardamos
                     (echo "contact_list";sleep 1;echo "msg $to Usuario $user conectado al puerto $puerto con ip $ip"; echo "safe_quit") |$telegram
