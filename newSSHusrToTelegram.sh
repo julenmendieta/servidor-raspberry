@@ -59,7 +59,7 @@ do
                 # Buscamos esa IP entre los usuarios conectados
                 coinci=`netstat -nt | grep -c "$ip"`
                 # Si no hay coincidencia toca eliminarlo e informar de que se ha salido
-                if $((coinci == 0))
+                if [ "$coinci" -eq "0" ]
                 then
                     datos=`cat $control | sed -n ${n}p`
                     (echo "contact_list";sleep 1;echo "msg $to $datos desconectado"; echo "safe_quit") |$telegram
