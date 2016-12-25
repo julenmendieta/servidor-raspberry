@@ -4,39 +4,35 @@
 # 1-Incluir el supuesto de que se desconecte y conecta alguien al mismo tiempo (el numero de conexiones no cambia)
 # 2-Se desconecten dos y conecte uno o al reves
 
-# Longitud original del comando netstat sin conexiones
-zeroLongi=2
 # Direccion al cliente de telegram
 telegram=/home/pi/programas/tg/bin/telegram-cli
 to=Julen
 # Direccion del fichero de control
 control=/home/pi/programas/varios/control
+# Parece ser que telegram abre nuevas conexiones que aparecen con estado TIME_WAIT al usar netstat, por lo que
+# hay que tenerlo en cuenta
 
 # Comprobamos que haya conexiones nuevas cada x segundos
 while true
 do 
-    # En este caso la longitud nos sirve para tener en cuenta 2 conexiones extra que se ven con w
-    longi=`netstat -nt | wc -l`
-    # En este caso unicamente queremos tener en cuenta los usuarios online
-    longi2=$((longi - 2))
+    # Guardamos la cantidad de conexiones SSH que tenemos abiertas
+    longi=`w -h | grep "pts/" | wc -l`
     # Siempre que haya usuarios conectados
-    if (($longi >= $zeroLongi))
+    if (($longi > 0))
     then
-        # Primero comprobamos que haya mayor o menor cantidad que en el analisis previo
+        # Primero comprobamos que haya mayor o menor cantidad de conexiones que en el analisis previo
         previo=`wc -l $control | awk '{print $1}'`
-        balance=$((longi2 - previo))
+        balance=$((longi - previo))
         # Si el balance es mayor que cero habra alguna conexion nueva
         if (($balance > 0))
         then
             # Por cada nueva linea vamos a recabar los datos y enviar un mensaje (por si se conectan 2 al mismo tiempo)
-            for n in $(seq "$((longi - zeroLongi))")
+            for pos in $(seq $longi)
             do
-                # Posicion en la que buscar
-                pos=$((n + zeroLongi))
                 # Parametros del nuevo usuario conectado
-                ip=`netstat -nt | sed -n ${pos}p | awk '{print $5}'`
-                puerto=`w -h | sed -n ${pos}p | awk '{print $2}'`
-                user=`w -h | sed -n ${n}p | awk '{print $1}'`
+                ip=`netstat -nt | grep "ESTABLISHED" | sed -n ${pos}p | awk '{print $5}'`
+                puerto=`w -h | grep "pts/" | sed -n ${pos}p | awk '{print $2}'`
+                user=`w -h | grep "pts/" | sed -n ${n}p | awk '{print $1}'`
                 # Comprobamos no haber avisado antes sobre este usuario
                 coinci=`grep -c "$user $puerto $ip" $control`
                 if [ "$coinci" -eq "0" ]
