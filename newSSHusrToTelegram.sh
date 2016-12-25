@@ -59,7 +59,8 @@ do
                 then
                     datos=`cat $control | sed -n ${n}p`
                     (echo "contact_list";sleep 1;echo "msg $to $datos desconectado"; echo "safe_quit") |$telegram
-                    grep -v "$datos" $control > $control
+                    temporal=`grep -v "$datos" $control`
+                    echo "$temporal" > $control
                 fi
             done
         fi
