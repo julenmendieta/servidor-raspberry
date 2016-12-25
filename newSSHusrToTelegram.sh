@@ -3,6 +3,7 @@
 # Me queda:
 # 1-Incluir el supuesto de que se desconecte y conecta alguien al mismo tiempo (el numero de conexiones no cambia)
 # 2-Se desconecten dos y conecte uno o al reves
+##### Hay un problema con la forma en la que se ordenan las nuevas ips
 
 # Direccion al cliente de telegram
 telegram=/home/pi/programas/tg/bin/telegram-cli
@@ -30,7 +31,8 @@ do
             for pos in $(seq $longi)
             do
                 # Parametros del nuevo usuario conectado
-                ip=`netstat -nt | grep "ESTABLISHED" | sed -n ${pos}p | awk '{print $5}'`
+                # Como las ips no se almacenan en orden hay que hacer un sort sirviendonos de lo que creo q es el puerto
+                ip=`netstat -nt | grep "ESTABLISHED" | sort -k 5,5 | sed -n ${pos}p | awk '{print $5}'`
                 puerto=`w -h | grep "pts/" | sed -n ${pos}p | awk '{print $2}'`
                 user=`w -h | grep "pts/" | sed -n ${pos}p | awk '{print $1}'`
                 # Comprobamos no haber avisado antes sobre este usuario
