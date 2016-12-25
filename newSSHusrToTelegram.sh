@@ -32,7 +32,7 @@ do
                 # Parametros del nuevo usuario conectado
                 ip=`netstat -nt | grep "ESTABLISHED" | sed -n ${pos}p | awk '{print $5}'`
                 puerto=`w -h | grep "pts/" | sed -n ${pos}p | awk '{print $2}'`
-                user=`w -h | grep "pts/" | sed -n ${n}p | awk '{print $1}'`
+                user=`w -h | grep "pts/" | sed -n ${pos}p | awk '{print $1}'`
                 # Comprobamos no haber avisado antes sobre este usuario
                 coinci=`grep -c "$user $puerto $ip" $control`
                 if [ "$coinci" -eq "0" ]
